@@ -5,7 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
  
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { ShopContext } from "@/context/ShopContext";
 
 const navigation = [
   { href: "/", label: "Home" },
@@ -17,6 +18,8 @@ const navigation = [
 export default function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { productCount } = useContext(ShopContext);
+  const cartCount = productCount();
 
   const linkClass = (href) =>
     `rounded-md px-3 py-2 text-sm font-medium transition-colors ${
@@ -59,8 +62,8 @@ export default function Navbar() {
 
             <Link
               href="/cart"
-              aria-label="Shopping cart"
-              className="rounded-full p-2 text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950"
+              aria-label={`Shopping cart, ${cartCount} ${cartCount === 1 ? "item" : "items"}`}
+              className="relative rounded-full p-2 text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950"
             >
               <svg
                 aria-hidden="true"
@@ -78,6 +81,14 @@ export default function Navbar() {
                 <circle cx="10" cy="20" r="1" />
                 <circle cx="18" cy="20" r="1" />
               </svg>
+              {cartCount > 0 && (
+                <span
+                  aria-hidden="true"
+                  className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-orange-600 text-[10px] font-semibold leading-none text-white"
+                >
+                  {cartCount}
+                </span>
+              )}
             </Link>
 
             <button

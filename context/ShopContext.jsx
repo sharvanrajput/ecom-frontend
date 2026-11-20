@@ -27,6 +27,16 @@ export const ShopContextProvider = ({ children }) => {
     });
   };
 
+  const productCount = () => {
+    let sum = 0;
+    for (const items in cartItems) {
+      for (const item in cartItems[items]) {
+        sum += cartItems[items][item];
+      }
+    }
+    return sum;
+  };
+
   const updateCartQuantity = (productId, size, quantity) => {
     const sizeKey = size ? size.toLowerCase() : "one-size";
 
@@ -64,6 +74,7 @@ export const ShopContextProvider = ({ children }) => {
     corrency,
     delevery_fee,
     cartItems,
+    productCount,
     addToCart,
     updateCartQuantity,
     removeFromCart,
