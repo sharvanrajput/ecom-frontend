@@ -1,7 +1,7 @@
-// import { products } from "@/assets/assets";
 "use client";
+
 import { dummyproducts } from "@/public/frontend_assets/assets";
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 export const ShopContext = createContext();
 
@@ -10,6 +10,22 @@ export const ShopContextProvider = ({ children }) => {
   const delevery_fee = 10;
   const products = dummyproducts;
   const [cartItems, setCartItems] = useState({});
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (savedToken) setToken(savedToken);
+  }, []);
+
+  const updateToken = (newToken) => {
+    setToken(newToken || "");
+    if (newToken) {
+      localStorage.setItem("token", newToken);
+    } else {
+      localStorage.removeItem("token");
+    }
+  };
 
   const addToCart = (productId, size) => {
     const sizeKey = size ? size.toLowerCase() : "one-size";
@@ -67,8 +83,6 @@ export const ShopContextProvider = ({ children }) => {
   const removeFromCart = (productId, size) =>
     updateCartQuantity(productId, size, 0);
 
-  console.log(cartItems);
-
   const value = {
     products,
     corrency,
@@ -78,6 +92,8 @@ export const ShopContextProvider = ({ children }) => {
     addToCart,
     updateCartQuantity,
     removeFromCart,
+    token,
+    setToken: updateToken,
   };
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;

@@ -4,21 +4,12 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 import {
-  LayoutDashboard,
-  Users,
-  ChartBar,
-  Folder,
-  FileText,
-  Bell,
-  Settings,
-  HelpCircle,
-  LogOut,
-  UserRound,
   ChevronsUpDown,
-  Plus,
   List,
-  ListOrderedIcon,
+  LogOut,
   Package,
+  Plus,
+  UserRound,
 } from "lucide-react";
 
 import {
@@ -42,26 +33,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+
 // Navigation links
 const navGroups = [
-  {
-    label: "Overview",
-    items: [
-      { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-      { title: "Users", href: "/users", icon: Users },
-      { title: "Analytics", href: "/analytics", icon: ChartBar },
-      { title: "Projects", href: "/projects", icon: Folder },
-    ],
-  },
   {
     label: "Manage",
     items: [
       { title: "Add Product", href: "/admin/add-items", icon: Plus },
-      { title: "All Product", href: "/admin/list-items", icon: List },
+      { title: "All Products", href: "/admin/list-items", icon: List },
       { title: "Orders", href: "/admin/orders", icon: Package },
     ],
   },
-   
 ];
 
 // User details
@@ -74,15 +56,17 @@ export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
+
   const handleLogout = () => {
-    router.push("/login");
+    adminLogout();
+    router.replace("/admin/login");
   };
 
   return (
     <Sidebar collapsible="icon">
       {/* Header */}
       <SidebarHeader className="p-4">
-        <Link href="/dashboard">
+        <Link href="/admin/list-items">
           <h2 className="text-xl font-bold">
             Admin <span className="text-muted-foreground">Panel</span>
           </h2>
@@ -144,22 +128,11 @@ export function AppSidebar() {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent side="top" align="start">
-            <Link href="/profile">
-              <DropdownMenuItem asChild>
-                <UserRound />
-                Profile
-              </DropdownMenuItem>
-            </Link>
-
-            <Link href="/settings/account">
-              <DropdownMenuItem asChild>
-                <Settings />
-                Account Settings
-              </DropdownMenuItem>
-            </Link>
-
-            <DropdownMenuItem onSelect={handleLogout}>
-              <LogOut />
+            <DropdownMenuItem
+              onSelect={handleLogout}
+              className="cursor-pointer text-red-600 focus:text-red-600"
+            >
+              <LogOut className="mr-2 size-4" />
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>

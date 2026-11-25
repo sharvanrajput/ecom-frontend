@@ -1,54 +1,45 @@
+"use client";
 
-"use client"
-
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AdminContext } from "@/context/AdminAuthContext";
+import { useRouter } from "next/navigation";
+import { useContext, useState } from "react";
 
 export default function LoginPage() {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { adminToken } = useContext(AdminContext);
 
-  const handleLogin = (e ) => {
-    e.preventDefault()
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    router.replace("/admin/list-items");
+  };
 
-    console.log({ email, password })
-
-    // Add your login API here
-    router.push("/dashboard")
+  if (adminToken) {
+    router.push("/admin/list-items");
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center  p-4">
-
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
-
-        {/* Heading */}
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg border">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Welcome Back
-          </h1>
-
-          <p className="mt-2 text-sm text-gray-500">
-            Login to your account
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
+          <p className="mt-2 text-sm text-gray-500">Login to your account</p>
         </div>
 
-        {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-5">
-
           <div className="space-y-2">
             <Label htmlFor="email">Email Address</Label>
-
             <Input
               id="email"
               type="email"
-              placeholder="Enter your email"
+              placeholder="admin@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -57,28 +48,31 @@ export default function LoginPage() {
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-
             <Input
               id="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
 
-          <Button type="submit" className="w-full">
-            Login
+          {error && (
+            <p role="alert" className="text-sm text-red-600">
+              {error}
+            </p>
+          )}
+
+          <Button
+            type="submit"
+            className="w-full cursor-pointer"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Logging in..." : "Login"}
           </Button>
-
         </form>
-
-        <p className="mt-6 text-center text-xs text-gray-500">
-          © 2026 Admin Panel. All rights reserved.
-        </p>
-
       </div>
     </div>
-  )
+  );
 }

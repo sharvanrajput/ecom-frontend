@@ -1,6 +1,3 @@
-
-"use client";
-
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,7 +6,7 @@ import { Copyright, Mail, Phone } from "lucide-react";
 import { assets } from "@/public/frontend_assets/assets";
 
 const Footer = () => {
-  const year = new Date().getFullYear();
+  const year = 2026;
 
   return (
     <footer className="bg-white border-t border-gray-200">
