@@ -14,16 +14,37 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { adminToken } = useContext(AdminContext);
+  const { AdminLogin } = useContext(AdminContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    router.replace("/admin/list-items");
-  };
+    setError("");
+    setIsSubmitting(true);
 
-  if (adminToken) {
-    router.push("/admin/list-items");
-  }
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"}/api/user/adminlogin`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email, password }),
+        }
+      );
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Unable to log in");
+      }
+
+      AdminLogin(data.token);
+      router.replace("/admin/list-items");
+    } catch (loginError) {
+      setError(loginError.message || "Unable to log in");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">

@@ -32,6 +32,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AdminContext } from "@/context/AdminAuthContext";
+import { useContext } from "react";
 
 
 // Navigation links
@@ -55,11 +57,21 @@ const user = {
 export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { AdminLogout } = useContext(AdminContext);
 
-
-  const handleLogout = () => {
-    adminLogout();
-    router.replace("/admin/login");
+  const handleLogout = async () => {
+    try {
+      await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"}/api/user/signout`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+    } finally {
+      AdminLogout();
+      router.replace("/admin/login");
+    }
   };
 
   return (

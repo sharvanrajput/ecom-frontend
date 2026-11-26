@@ -16,7 +16,7 @@ const paymentMethods = [
 ];
 
 export default function PlaceOrderPage() {
-  const { cartItems, products, corrency, delevery_fee } =
+  const { cartItems, products, cartHydrated, cartError, corrency, delevery_fee } =
     useContext(ShopContext);
   const [paymentMethod, setPaymentMethod] = useState("razorpay");
   const [submissionMessage, setSubmissionMessage] = useState("");
@@ -40,6 +40,14 @@ export default function PlaceOrderPage() {
   const total = subtotal + shipping;
   const formatSize = (size) =>
     size === "one-size" ? "One size" : size.toUpperCase();
+
+  if (!cartHydrated) {
+    return (
+      <main className="flex flex-1 items-center justify-center px-4 py-16">
+        <p className="text-sm text-slate-500">Loading your order...</p>
+      </main>
+    );
+  }
 
   if (cartEntries.length === 0) {
     return (
@@ -101,6 +109,14 @@ export default function PlaceOrderPage() {
             Add your delivery details and choose how you would like to pay.
           </p>
         </div>
+        {cartError && (
+          <p
+            role="alert"
+            className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+          >
+            {cartError}
+          </p>
+        )}
 
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -308,7 +324,7 @@ export default function PlaceOrderPage() {
                   key={`${item.productId}-${item.size}`}
                   className="flex gap-3"
                 >
-                  {item.product ? (
+                  {item.product?.image?.[0] ? (
                     <div className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-slate-100">
                       <Image
                         src={item.product.image[0]}
@@ -317,6 +333,10 @@ export default function PlaceOrderPage() {
                         sizes="64px"
                         className="object-cover"
                       />
+                    </div>
+                  ) : item.product ? (
+                    <div className="flex size-16 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-[10px] text-slate-400">
+                      No image
                     </div>
                   ) : (
                     <div className="flex size-16 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-[10px] text-slate-400">

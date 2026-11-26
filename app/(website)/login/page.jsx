@@ -1,15 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ShopContext } from "@/context/ShopContext";
+import { ADMIN_API_URL } from "@/lib/admin-api";
 
 export default function LoginPage() {
   const [mode, setMode] = useState("signup");
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setToken } = useContext(ShopContext);
+  const router = useRouter();
   const isSignUp = mode === "signup";
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    setMessage("Authentication is not connected yet. Please try again later.");
+    setMessage("");
+    setIsSubmitting(true);
+
+    const formData = new FormData(event.currentTarget);
+    const payload = {
+      email: formData.get("email"),
+      password: formData.get("password"),
+    };
+    if (isSignUp) payload.name = formData.get("name");
+
+    try {
+      const response = await fetch(
+        `${ADMIN_API_URL}/api/user/${isSignUp ? "signup" : "signin"}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        },
+      );
+      const result = await response.json();
+
+      if (!response.ok || !result.success || !result.token) {
+        throw new Error(result.message || "Authentication failed. Please try again.");
+      }
+
+      setToken(result.token);
+      router.push("/");
+    } catch (error) {
+      setMessage(error.message || "Unable to connect. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -168,9 +206,14 @@ export default function LoginPage() {
 
               <button
                 className="w-full rounded-xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-950"
+                disabled={isSubmitting}
                 type="submit"
               >
-                {isSignUp ? "Create account" : "Sign in"}
+                {isSubmitting
+                  ? "Please wait..."
+                  : isSignUp
+                    ? "Create account"
+                    : "Sign in"}
               </button>
             </form>
 
@@ -217,7 +260,7 @@ export default function LoginPage() {
               Continue with Google
             </button>
 
-            <p aria-live="polite" className="mt-3 min-h-5 text-center text-sm text-slate-600">
+            <p aria-live="polite" className="mt-3 min-h-5 text-center text-sm text-red-600">
               {message}
             </p>
 

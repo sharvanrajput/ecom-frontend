@@ -5,7 +5,12 @@ import { ShopContext } from "@/context/ShopContext";
 import { useContext, useMemo, useState } from "react";
 
 export default function CollectionsPage() {
-  const { products } = useContext(ShopContext);
+  const {
+    products,
+    productsLoading,
+    productsError,
+    refreshProducts,
+  } = useContext(ShopContext);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState([]);
 
@@ -130,11 +135,29 @@ export default function CollectionsPage() {
           </aside>
 
           <section aria-label="Collection products">
-            <p className="mb-4 text-sm text-slate-500" aria-live="polite">
-              Showing {filteredProducts.length} of {products.length} products
-            </p>
-
-            {filteredProducts.length > 0 ? (
+            {productsLoading ? (
+              <p className="rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center text-sm text-slate-500">
+                Loading products...
+              </p>
+            ) : productsError ? (
+              <div className="rounded-2xl border border-red-100 bg-red-50 px-6 py-12 text-center">
+                <p role="alert" className="text-sm text-red-700">
+                  {productsError}
+                </p>
+                <button
+                  type="button"
+                  onClick={refreshProducts}
+                  className="mt-4 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-orange-600"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : (
+              <>
+                <p className="mb-4 text-sm text-slate-500" aria-live="polite">
+                  Showing {filteredProducts.length} of {products.length} products
+                </p>
+                {filteredProducts.length > 0 ? (
               <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-5 lg:grid-cols-3 xl:grid-cols-4">
                 {filteredProducts.map((product) => (
                   <ProductItem
@@ -170,6 +193,8 @@ export default function CollectionsPage() {
                   </button>
                 )}
               </div>
+                )}
+              </>
             )}
           </section>
         </div>

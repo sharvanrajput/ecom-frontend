@@ -9,6 +9,8 @@ export default function CartPage() {
   const {
     cartItems,
     products,
+    cartHydrated,
+    cartError,
     corrency,
     delevery_fee,
     updateCartQuantity,
@@ -37,6 +39,14 @@ export default function CartPage() {
   const formatSize = (size) =>
     size === "one-size" ? "One size" : size.toUpperCase();
 
+  if (!cartHydrated) {
+    return (
+      <main className="flex flex-1 items-center justify-center px-4 py-16">
+        <p className="text-sm text-slate-500">Loading your cart...</p>
+      </main>
+    );
+  }
+
   if (cartEntries.length === 0) {
     return (
       <main className="flex flex-1 items-center justify-center px-4 py-16 sm:py-24">
@@ -62,6 +72,11 @@ export default function CartPage() {
           <h1 className="mt-5 text-2xl font-semibold tracking-tight text-slate-950">
             Your cart is empty
           </h1>
+          {cartError && (
+            <p role="alert" className="mt-3 text-sm text-red-700">
+              {cartError}
+            </p>
+          )}
           <p className="mt-2 text-sm leading-6 text-slate-500">
             Browse the collections and add something you love.
           </p>
@@ -92,6 +107,14 @@ export default function CartPage() {
             {itemCount} {itemCount === 1 ? "item" : "items"}
           </p>
         </div>
+        {cartError && (
+          <p
+            role="alert"
+            className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+          >
+            {cartError}
+          </p>
+        )}
 
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
           <section aria-label="Cart items" className="divide-y divide-slate-200">
@@ -100,7 +123,7 @@ export default function CartPage() {
                 key={`${item.productId}-${item.size}`}
                 className="flex gap-4 py-5 sm:items-center sm:gap-6"
               >
-                {item.product ? (
+                {item.product?.image?.[0] ? (
                   <Link
                     href={`/product/${item.productId}`}
                     className="relative size-24 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:size-28"
@@ -113,6 +136,10 @@ export default function CartPage() {
                       className="object-cover"
                     />
                   </Link>
+                ) : item.product ? (
+                  <div className="flex size-24 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs text-slate-400 sm:size-28">
+                    No image
+                  </div>
                 ) : (
                   <div className="flex size-24 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs text-slate-400 sm:size-28">
                     Unavailable

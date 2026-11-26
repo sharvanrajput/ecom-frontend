@@ -6,15 +6,48 @@ import Link from "next/link";
 import { useContext, useState } from "react";
 
 export default function ProductDetails({ productId }) {
-  const { products, corrency, addToCart } = useContext(ShopContext);
+  const {
+    products,
+    productsLoading,
+    productsError,
+    refreshProducts,
+    corrency,
+    addToCart,
+    cartError,
+  } = useContext(ShopContext);
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState("");
   const [addedToCart, setAddedToCart] = useState(false);
 
-  if (products.length === 0) {
+  if (productsLoading) {
     return (
       <main className="flex flex-1 items-center justify-center px-4 py-24">
         <p className="text-sm text-slate-500">Loading product details...</p>
+      </main>
+    );
+  }
+
+  if (productsError) {
+    return (
+      <main className="flex flex-1 flex-col items-center justify-center px-4 py-24 text-center">
+        <p role="alert" className="text-sm text-red-700">
+          {productsError}
+        </p>
+        <button
+          type="button"
+          onClick={refreshProducts}
+          className="mt-5 rounded-full bg-slate-900 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-orange-600"
+        >
+          Try again
+        </button>
+      </main>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <main className="flex flex-1 items-center justify-center px-4 py-24">
+        <p className="text-sm text-slate-500">No products are available yet.</p>
       </main>
     );
   }
@@ -40,14 +73,14 @@ export default function ProductDetails({ productId }) {
     );
   }
 
+  const productImages = product.image ?? [];
   const sizes = product.sizes ?? [];
   const handleAddToCart = () => {
     if (sizes.length > 0 && !selectedSize) {
       return;
     }
 
-    addToCart(product._id, selectedSize);
-    setAddedToCart(true);
+    setAddedToCart(addToCart(product._id, selectedSize));
   };
 
   return (
@@ -65,14 +98,14 @@ export default function ProductDetails({ productId }) {
           <section
             aria-label="Product images"
             className={`grid gap-3 ${
-              product.image.length > 1
+              productImages.length > 1
                 ? "grid-cols-[56px_minmax(0,1fr)] sm:grid-cols-[80px_minmax(0,1fr)]"
                 : "grid-cols-1"
             }`}
           >
-            {product.image.length > 1 && (
+            {productImages.length > 1 && (
               <div className="flex flex-col gap-3">
-                {product.image.map((image, index) => (
+                {productImages.map((image, index) => (
                   <button
                     key={`${product._id}-image-${index}`}
                     type="button"
@@ -99,16 +132,22 @@ export default function ProductDetails({ productId }) {
                 ))}
               </div>
             )}
-            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-slate-100">
-              <Image
-                src={product.image[selectedImage]}
-                alt={product.name}
-                fill
-                priority
-                sizes="(max-width: 1024px) 80vw, 40vw"
-                className="object-cover"
-              />
-            </div>
+            {productImages.length ? (
+              <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-slate-100">
+                <Image
+                  src={productImages[selectedImage]}
+                  alt={product.name}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 80vw, 40vw"
+                  className="object-cover"
+                />
+              </div>
+            ) : (
+              <div className="flex aspect-[4/5] items-center justify-center rounded-2xl bg-slate-100 text-sm text-slate-400">
+                No product image
+              </div>
+            )}
           </section>
 
           <section className="lg:py-5">
@@ -177,6 +216,11 @@ export default function ProductDetails({ productId }) {
                 role="status"
               >
                 Added to cart.
+              </p>
+            )}
+            {cartError && (
+              <p className="mt-3 text-sm text-red-700" role="alert">
+                {cartError}
               </p>
             )}
 

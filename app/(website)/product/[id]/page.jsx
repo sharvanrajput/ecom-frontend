@@ -1,8 +1,7 @@
 import ProductDetails from "@/components/ProductDetails";
-import { dummyproducts } from "@/public/frontend_assets/assets";
 
 export function generateStaticParams() {
-  return dummyproducts.map((product) => ({ id: product._id }));
+  return [{ id: "__product_placeholder__" }];
 }
 
 export default async function ProductDetailsPage({ params }) {
